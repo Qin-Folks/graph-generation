@@ -9,7 +9,7 @@ from torch import optim
 import torch.nn.functional as F
 import torch.nn.init as init
 
-import model
+import model_
 
 
 class GraphVAE(nn.Module):
@@ -21,20 +21,20 @@ class GraphVAE(nn.Module):
             latent_dim: dimension of the latent representation of graph.
         '''
         super(GraphVAE, self).__init__()
-        self.conv1 = model.GraphConv(input_dim=input_dim, output_dim=hidden_dim)
+        self.conv1 = model_.GraphConv(input_dim=input_dim, output_dim=hidden_dim)
         self.bn1 = nn.BatchNorm1d(input_dim)
-        self.conv2 = model.GraphConv(input_dim=hidden_dim, output_dim=hidden_dim)
+        self.conv2 = model_.GraphConv(input_dim=hidden_dim, output_dim=hidden_dim)
         self.bn2 = nn.BatchNorm1d(input_dim)
         self.act = nn.ReLU()
 
         output_dim = max_num_nodes * (max_num_nodes + 1) // 2
         #self.vae = model.MLP_VAE_plain(hidden_dim, latent_dim, output_dim)
-        self.vae = model.MLP_VAE_plain(input_dim * input_dim, latent_dim, output_dim)
+        self.vae = model_.MLP_VAE_plain(input_dim * input_dim, latent_dim, output_dim)
         #self.feature_mlp = model.MLP_plain(latent_dim, latent_dim, output_dim)
 
         self.max_num_nodes = max_num_nodes
         for m in self.modules():
-            if isinstance(m, model.GraphConv):
+            if isinstance(m, model_.GraphConv):
                 m.weight.data = init.xavier_uniform(m.weight.data, gain=nn.init.calculate_gain('relu'))
             elif isinstance(m, nn.BatchNorm1d):
                 m.weight.data.fill_(1)
@@ -153,15 +153,15 @@ class GraphVAE(nn.Module):
         #adj_permuted = self.permute_adj(adj_data, row_ind, col_ind)
         adj_permuted = adj_data
         adj_vectorized = adj_permuted[torch.triu(torch.ones(self.max_num_nodes,self.max_num_nodes) )== 1].squeeze_()
-        adj_vectorized_var = Variable(adj_vectorized).cuda()
+        adj_vectorized_var = Variable(adj_vectorized, requires_grad=False).cuda()
 
         #print(adj)
         #print('permuted: ', adj_permuted)
         #print('recon: ', recon_adj_tensor)
-        adj_recon_loss = self.adj_recon_loss(adj_vectorized_var, out[0])
+        print('out[0]', out[0])
+        adj_recon_loss = self.adj_recon_loss(out[0], adj_vectorized_var)
         print('recon: ', adj_recon_loss)
         print(adj_vectorized_var)
-        print(out[0])
 
         loss_kl = -0.5 * torch.sum(1 + z_lsgms - z_mu.pow(2) - z_lsgms.exp())
         loss_kl /= self.max_num_nodes * self.max_num_nodes # normalize

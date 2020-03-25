@@ -14,7 +14,7 @@ import random
 import shutil
 import os
 import time
-from model import *
+from model_ import *
 from utils import *
 
 

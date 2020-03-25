@@ -17,7 +17,7 @@ import data
 from baselines.graphvae.model import GraphVAE
 from baselines.graphvae.data import GraphAdjSampler
 
-CUDA = 2
+CUDA = 1
 
 LR_milestones = [500, 1000]
 

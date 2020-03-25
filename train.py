@@ -22,7 +22,7 @@ import scipy.misc
 import time as tm
 
 from utils import *
-from model import *
+from model_ import *
 from data import *
 from args import Args
 import create_graphs
