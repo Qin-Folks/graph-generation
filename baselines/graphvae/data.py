@@ -9,7 +9,7 @@ class GraphAdjSampler(torch.utils.data.Dataset):
         self.len_all = []
         self.feature_all = []
 
-        for G in G_list:
+        for G in G_list:  # G_list是所有的graphs
             adj = nx.to_numpy_matrix(G)
             # the diagonal entries are 1 since they denote node probability
             self.adj_all.append(

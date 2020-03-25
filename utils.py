@@ -14,10 +14,10 @@ import community
 import pickle
 import re
 
-import data
+import data_
 
 def citeseer_ego():
-    _, _, G = data.Graph_load(dataset='citeseer')
+    _, _, G = data_.Graph_load(dataset='citeseer')
     G = max(nx.connected_component_subgraphs(G), key=len)
     G = nx.convert_node_labels_to_integers(G)
     graphs = []

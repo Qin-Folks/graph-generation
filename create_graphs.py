@@ -2,7 +2,7 @@ import networkx as nx
 import numpy as np
 
 from utils import *
-from data import *
+from data_ import *
 
 def create(args):
 ### load datasets
