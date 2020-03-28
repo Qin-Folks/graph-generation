@@ -110,7 +110,8 @@ class GraphVAE(nn.Module):
         return out
 
     def forward(self, input_features, adj):
-        print('input feature: \n', input_features.shape)
+        print('input features: ', input_features)
+        print('adj: ', adj)
         # x = self.conv1(input_features, adj)
         # x = self.bn1(x)
         # x = self.act(x)
@@ -124,10 +125,9 @@ class GraphVAE(nn.Module):
         h_decode, z_mu, z_lsgms = self.vae(graph_h)
         out = F.sigmoid(h_decode)
         out_tensor = out.cpu().data
-        print('out tensor: \n', out_tensor)
         recon_adj_lower = self.recover_adj_lower(out_tensor)
-        print('recon adj lower: \n', recon_adj_lower)
         recon_adj_tensor = self.recover_full_adj_from_lower(recon_adj_lower)
+        # 到此, out_tensor变成了一个矩阵. 这个矩阵是对称的, 并且上半部分等同于out_tensor.
 
         # set matching features be degree
         out_features = torch.sum(recon_adj_tensor, 1)
@@ -160,10 +160,9 @@ class GraphVAE(nn.Module):
         # print(adj)
         # print('permuted: ', adj_permuted)
         # print('recon: ', recon_adj_tensor)
-        print('out[0]', out[0])
+        print('out[0]', out[0].shape)
         adj_recon_loss = self.adj_recon_loss(out[0], adj_vectorized_var)
-        print('recon: ', adj_recon_loss)
-        print(adj_vectorized_var)
+        print('recon: ', adj_vectorized_var.shape)
 
         loss_kl = -0.5 * torch.sum(1 + z_lsgms - z_mu.pow(2) - z_lsgms.exp())
         loss_kl /= self.max_num_nodes * self.max_num_nodes  # normalize
